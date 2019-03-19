@@ -12,6 +12,7 @@ def heuristic(grid) -> int:
         pos = row.index(1)
         her_sum = 0
         for i in range(n):
+            # mengecek adakah yang saling serang
             if(grid[i][pos] == 1 and i!=r): her_sum +=1
             if(pos-i>=0 and r-i>=0 and i!=0 and grid[r-i][pos-i] == 1): her_sum+=1
             if(pos+i<n and r+i< n  and i!=0 and grid[r+i][pos+i] == 1): her_sum+=1
@@ -23,6 +24,7 @@ def heuristic(grid) -> int:
     return her
 
 def move(grid, i: int , dir: str) -> list(list()):
+    # memindahkan berdasarkan left right setiap baris 
     state = copy.deepcopy(grid)
     pos = state[i].index(1)
     n = len(state)
@@ -34,11 +36,13 @@ def move(grid, i: int , dir: str) -> list(list()):
         return state
     return state
 
+# class queen
 class QuuenProblem():
+    # generate kosong n x n 
     def __init__(self, n: int):
         self.n = n
         self.grid = [[0] * n for i in range(n)]
-
+    # generate initial state n x n setiap baris random
     def generate_random(self):
         for row in self.grid:
             row[random.randint(0, self.n-1)] = 1
@@ -46,17 +50,17 @@ class QuuenProblem():
     def search_astar(self):
         visited = set()
         parent = {}
-        gn = {str(self.grid): 0}
-        fn = {str(self.grid): heuristic(self.grid)}
+        gn = {str(self.grid): 0}                        # g(n) = step = 1
+        fn = {str(self.grid): heuristic(self.grid)}     # f(n) = heuristic(current) + g(n)
 
-        pq = [] 
+        pq = []                                         #piority queue
 
-        heapq.heappush(pq, (fn[str(self.grid)], self.grid))
+        heapq.heappush(pq, (fn[str(self.grid)], self.grid)) #push initial state dan fn
         count = 0
         self.print()
         while pq:
-            neighbor = {}
-            current = heapq.heappop(pq)[1]
+            neighbor = {}                       # set dari tetangga/anak dari current state
+            current = heapq.heappop(pq)[1] 
             count+=1
             n = self.n
             # Jika mencapai goal
@@ -66,10 +70,10 @@ class QuuenProblem():
                 while str(current) in parent:
                     path.append(str(current))
                     current = eval(parent[str(current)])
-                return path[::-1]
+                return path[::-1]                           #pass list of parent dari solusi
 
             visited.add(str(current))
-            pindah = ["l","r"]
+            pindah = ["l","r"]                  #pindah perbaris berdasarkan left right
             for i in range(n):
                 for l in pindah:
                     # print(str(i)+" "+l)
@@ -77,10 +81,10 @@ class QuuenProblem():
                     if str(neighbor) in visited:
                         # print(str(i)+" "+str(l)+" isvisited")
                         continue
-                    gn_temp = gn[str(current)] + 1
+                    gn_temp = gn[str(current)] + 1      #tambahkan gn
                     # print(neighbor)
-                    fn_temp = gn_temp + heuristic(neighbor)
-                    if str(neighbor) in fn and fn_temp < fn[str(neighbor)] or str(neighbor) not in fn:
+                    fn_temp = gn_temp + heuristic(neighbor)     #akumulasi fn
+                    if str(neighbor) in fn and fn_temp < fn[str(neighbor)] or str(neighbor) not in fn:      #apabila belum ada atau fn yang sudah ada kurang dari sekarang
                         if str(neighbor) not in fn:
                             heapq.heappush(pq, (fn_temp,neighbor))
                         parent[str(neighbor)] = str(current)
@@ -130,7 +134,6 @@ class QuuenProblem():
         for row in self.grid:
             print(row)
 
-    # def search_astar():
 
 
 def main():
@@ -138,15 +141,16 @@ def main():
     qq.generate_random()
     # qq.heuristic()
     # qq.print()
-    sol = qq.search_astar()
     print("A*")
+    sol = qq.search_astar()
     for i in range(len(sol)):
         print("Step "+str(i+1))
         curr = eval(sol[i])
         for row in range(len(curr)):
             print(curr[row])
-    sol = qq.search_bfs()
+    print()
     print("BFS")
+    sol = qq.search_bfs()
     for i in range(len(sol)):
         print("Step "+str(i+1))
         curr = eval(sol[i])
